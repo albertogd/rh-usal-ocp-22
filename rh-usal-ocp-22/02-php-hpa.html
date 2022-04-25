@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Autoscaling based on CPU Utilization :: Autoscaling applications with Openshift</title>
+    <link rel="canonical" href="https://albertogd.github.io/rh-usal-ocp-22/rh-usal-ocp-22/index.html/rh-usal-ocp-22/02-php-hpa.html">
+    <link rel="prev" href="01-setup.html">
+    <link rel="next" href="03-python-hpa.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="../_/img/header_logo.png" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://albertogd.github.io/rh-usal-ocp-22/rh-usal-ocp-22/index.html">Autoscaling applications with Openshift</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="rh-usal-ocp-22" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">Auotscaling applications with Openshift</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html">1. Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#prerequisite">Prerequisites</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-php-hpa.html">2. Horizontal Pod Autoscaler for CPU utilization</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#applications">2.1 Create a PHP application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#requests">2.2 Configure requests and limits</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#cpu">2.3 Autoscaling based on CPU utilization</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-python-hpa.html">3. Horizontal Pod Autoscaler for Memory utilization</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-python-hpa.html#applications">3.1 Create a Python application</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-python-hpa.html#requests">3.2 Configure requests and limits</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-python-hpa.html#memory">2.3 Autoscaling based on Memory utilization</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Auotscaling applications with Openshift</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Auotscaling applications with Openshift</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Auotscaling applications with Openshift</a></li>
+    <li><a href="02-php-hpa.html">2. Horizontal Pod Autoscaler for CPU utilization</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/albertogd/rh-usal-ocp-22/edit/master/documentation/modules/ROOT/pages/02-php-hpa.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Autoscaling based on CPU Utilization</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this exercise, you will create a PHP application to simulate CPU load to test application autoscaling using Horizontal Pod Autoscaler.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="applications"><a class="anchor" href="#applications"></a>Create a PHP applications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>1) Create a PHP applications using S2I and expose the applications.</p>
+</div>
+<div class="paragraph">
+<p>PHP application:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Name</strong>: stress-php</p>
+</li>
+<li>
+<p><strong>Repo</strong>: <a href="https://github.com/albertogd/rh-usal-ocp-22.git" class="bare">https://github.com/albertogd/rh-usal-ocp-22.git</a></p>
+</li>
+<li>
+<p><strong>Branch</strong>: master</p>
+</li>
+<li>
+<p><strong>Path</strong>: apps/hpa/stress-php</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc new-app <a href="https://github.com/albertogd/rh-usal-ocp-22.git" class="bare">https://github.com/albertogd/rh-usal-ocp-22.git</a> --context-dir apps/hpa/stress-php --name stress-php
+$ oc expose svc/stress-php</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="requests"><a class="anchor" href="#requests"></a>Configure requests and limits</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>2) Configure the applications with a request of cpu = 200m and memory = 200M, and a limit of cpu = 400m and memory = 200M.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc set resources deployment/stress-php --requests=cpu=200m,memory=200M --limits=cpu=400m,memory=400M</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Check the requests and limits configured:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc describe deployment/stress-php | grep -A2 "Request\|Limit"
+    Limits:
+      cpu:     400m
+      memory:  400M
+    Requests:
+      cpu:        200m
+      memory:     200M</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As default route timeout is 30 seconds, add an annotation to the route to increase timeout to 5 min.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc annotate route stress-php haproxy.router.openshift.io/timeout=300s --overwrite</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HorizontalPodAutoscaler depends on metrics, so your cluster must have metrics configured. Use oc get PodMetrics command to determine if metrics are configured</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc get PodMetrics
+NAME                                   CPU      MEMORY          WINDOW
+stress-php-787bc8b45b-jwc2r            2m       33256Ki          5m0s</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cpu"><a class="anchor" href="#cpu"></a>Autoscaling based on CPU utilization</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>3) In this part you’ll test CPU autoscale. Create a HPA with a minimum of 1 pod, a maximum of 10 pods, and a cpu percent of 50%.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc autoscale deployment/stress-php --min=1 --max=10 --cpu-percent=50</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HPA will maintain an average CPU utilization across all Pods of 50% (since each pod requests 200 milli-cores), this means average CPU usage of 100 milli-cores.</p>
+</div>
+<div class="paragraph">
+<p>Wait a couple of minutes for HPA to gather metrics of the application, and check hpa status until Target is defined.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc get hpa
+NAME                REFERENCE                        TARGETS      MINPODS  MAXPODS  REPLICAS   AGE
+stress-php         Deployment/stress-php         &lt;unknown&gt;/50%          1               10           0              8s
+…
+
+NAME                REFERENCE                      TARGETS     MINPODS    MAXPODS   REPLICAS   AGE
+stress-php        Deployment/stress-php              3%/50%           1                 10                   0              3m</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The PHP application has an endpoint cpu.php?minutes=X to simulate a load during the defined time. Get each application route, and make a request for 2 minute. You can use your web browser to make the request, as it generates an output:</p>
+</div>
+<div class="paragraph">
+<p>The Python application has an endpoint  /cpu/&lt;minutes&gt;. Make the request using curl as it returns an empty response:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl <a href="http://$(oc" class="bare">http://$(oc</a> get route stress-php -o json | jq -r '.spec.host')/cpu.php?minutes=2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In another terminal, check with PodMetrics the current CPU load, the hpa and the number of pods.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc get PodMetrics
+NAME                                                    CPU        MEMORY     WINDOW
+stress-php-787bc8b45b-jwc2r         398m       33256Ki          5m0s
+
+$ oc get hpa
+NAME       REFERENCE                         TARGETS     MINPODS   MAXPODS   REPLICAS   AGE
+stress-php   Deployment/stress-php         199%/50%            1                     10                    4             2d21h
+
+$ oc get pods  --field-selector status.phase=Running -o name | wc -l
+4
+
+$ oc get PodMetrics
+NAME                                  CPU       MEMORY       WINDOW
+stress-php-787bc8b45b-jwc2r           2m       33256Ki        5m0s
+stress-php-787bc8b45b-p86p6           2m       28852Ki        5m0s
+stress-php-787bc8b45b-qlm72           2m       29004Ki        5m0s
+stress-php-787bc8b45b-sbvxz          399m      40944Ki        5m0s</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Can you explain the CPU and the increase (nº of replicas)?</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>We configured a CPU limit of 400m, so this is the maximum that our pod is going to use. The targetCPUUtilizationPercentage was configured to 50% of the request (200m), so for each 100m used, a new pod will be created.</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 40%;">
+<colgroup>
+<col style="width: 60%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">TARGET</th>
+<th class="tableblock halign-center valign-top">PODS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0-49% / 50%</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">50%-99% / 50%</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">100% - 149% / 50%</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">150% - 199% / 50%</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="01-setup.html">1. Setup</a></span>
+  <span class="next"><a href="03-python-hpa.html">3. Horizontal Pod Autoscaler for Memory utilization</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
