@@ -1,0 +1,142 @@
+= Autoscaling based on CPU Utilization
+
+In this exercise, you will create a PHP application to simulate CPU load to test application autoscaling using Horizontal Pod Autoscaler.
+
+[#applications]
+== Create a PHP applications
+
+1) Create a PHP applications using S2I and expose the applications.
+
+PHP application:
+
+- *Name*: stress-php
+- *Repo*: https://github.com/albertogd/rh-usal-ocp-22.git
+- *Branch*: master
+- *Path*: apps/hpa/stress-php
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc new-app https://github.com/albertogd/rh-usal-ocp-22.git --context-dir apps/hpa/stress-php --name stress-php
+$ oc expose svc/stress-php
+----
+
+[#requests]
+== Configure requests and limits
+
+2) Configure the applications with a request of cpu = 200m and memory = 200M, and a limit of cpu = 400m and memory = 200M.
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc set resources deployment/stress-php --requests=cpu=200m,memory=200M --limits=cpu=400m,memory=400M
+----
+
+Check the requests and limits configured:
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc describe deployment/stress-php | grep -A2 "Request\|Limit"
+    Limits:
+      cpu:     400m
+      memory:  400M
+    Requests:
+      cpu:        200m
+      memory:     200M
+----
+
+As default route timeout is 30 seconds, add an annotation to the route to increase timeout to 5 min.
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc annotate route stress-php haproxy.router.openshift.io/timeout=300s --overwrite
+----
+
+HorizontalPodAutoscaler depends on metrics, so your cluster must have metrics configured. Use oc get PodMetrics command to determine if metrics are configured
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc get PodMetrics
+NAME                                   CPU      MEMORY          WINDOW
+stress-php-787bc8b45b-jwc2r            2m       33256Ki          5m0s
+----
+
+[#cpu]
+== Autoscaling based on CPU utilization
+
+3) In this part you’ll test CPU autoscale. Create a HPA with a minimum of 1 pod, a maximum of 10 pods, and a cpu percent of 50%.
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc autoscale deployment/stress-php --min=1 --max=10 --cpu-percent=50
+----
+
+HPA will maintain an average CPU utilization across all Pods of 50% (since each pod requests 200 milli-cores), this means average CPU usage of 100 milli-cores.
+
+Wait a couple of minutes for HPA to gather metrics of the application, and check hpa status until Target is defined.
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc get hpa
+NAME                REFERENCE                        TARGETS      MINPODS  MAXPODS  REPLICAS   AGE
+stress-php         Deployment/stress-php         <unknown>/50%          1               10           0              8s
+…
+
+NAME                REFERENCE                      TARGETS     MINPODS    MAXPODS   REPLICAS   AGE
+stress-php        Deployment/stress-php              3%/50%           1                 10                   0              3m
+----
+
+The PHP application has an endpoint cpu.php?minutes=X to simulate a load during the defined time. Get each application route, and make a request for 2 minute. You can use your web browser to make the request, as it generates an output:
+
+The Python application has an endpoint  /cpu/<minutes>. Make the request using curl as it returns an empty response:
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ curl http://$(oc get route stress-php -o json | jq -r '.spec.host')/cpu.php?minutes=2
+----
+
+In another terminal, check with PodMetrics the current CPU load, the hpa and the number of pods. 
+
+[source,bash,subs="+macros,+attributes"]
+----
+$ oc get PodMetrics
+NAME                                                    CPU        MEMORY     WINDOW
+stress-php-787bc8b45b-jwc2r         398m       33256Ki          5m0s
+
+$ oc get hpa
+NAME       REFERENCE                         TARGETS     MINPODS   MAXPODS   REPLICAS   AGE
+stress-php   Deployment/stress-php         199%/50%            1                     10                    4             2d21h
+
+$ oc get pods  --field-selector status.phase=Running -o name | wc -l
+4
+
+$ oc get PodMetrics
+NAME                                  CPU       MEMORY       WINDOW
+stress-php-787bc8b45b-jwc2r           2m       33256Ki        5m0s
+stress-php-787bc8b45b-p86p6           2m       28852Ki        5m0s
+stress-php-787bc8b45b-qlm72           2m       29004Ki        5m0s
+stress-php-787bc8b45b-sbvxz          399m      40944Ki        5m0s
+----
+
+Can you explain the CPU and the increase (nº of replicas)?
+
+====
+We configured a CPU limit of 400m, so this is the maximum that our pod is going to use. The targetCPUUtilizationPercentage was configured to 50% of the request (200m), so for each 100m used, a new pod will be created.
+
+
+[cols="^60%,^40%" width="40%"]
+|===
+|TARGET|PODS 
+
+|0-49% / 50%
+|1
+
+|50%-99% / 50%
+|2
+
+|100% - 149% / 50%
+|3
+
+|150% - 199% / 50%
+|4
+|===
+
+====

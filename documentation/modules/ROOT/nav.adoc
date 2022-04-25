@@ -1,7 +1,12 @@
 * xref:01-setup.adoc[1. Setup]
 ** xref:01-setup.adoc#prerequisite[Prerequisites]
-** xref:01-setup.adoc#minikube[Setup Minikube]
 
-* xref:02-deploy.adoc[2. Deploy Service]
-** xref:02-deploy.adoc#package[Build Service]
-** xref:02-deploy.adoc#deploy[Deploy Dervice]
+* xref:02-php-hpa.adoc[2. Horizontal Pod Autoscaler for CPU utilization]
+** xref:02-php-hpa.adoc#applications[2.1 Create a PHP application]
+** xref:02-php-hpa.adoc#requests[2.2 Configure requests and limits]
+** xref:02-php-hpa.adoc#cpu[2.3 Autoscaling based on CPU utilization]
+
+* xref:03-python-hpa.adoc[3. Horizontal Pod Autoscaler for Memory utilization]
+** xref:03-python-hpa.adoc#applications[3.1 Create a Python application]
+** xref:03-python-hpa.adoc#requests[3.2 Configure requests and limits]
+** xref:03-python-hpa.adoc#memory[2.3 Autoscaling based on Memory utilization]

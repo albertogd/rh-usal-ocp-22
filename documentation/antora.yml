@@ -1,5 +1,5 @@
-name: template-tutorial
-title: Template Tutorial
+name: rh-usal-ocp-22
+title: Auotscaling applications with Openshift
 version: master
 nav:
   - modules/ROOT/nav.adoc

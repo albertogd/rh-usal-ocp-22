@@ -1,20 +1,23 @@
-= Welcome to Template Tutorial
-:page-layout: home
-:!sectids:
+= Autoscaling Applications in Openshift
+//:page-layout: home
+//:!sectids:
 
 [.text-center.strong]
-== Publish Services to Kubernetes
+== Introduction
 
-A Kubernetes tutorial to show how you can deploy a Java service to a Kubernetes cluster as it was a child game.
+**Autoscaling applications in Openshift**  is the third part of **Autoscaling serverless applications in Openshift** workshop to get familiar with containers and autoscaling serverless applications in Openshift. You’ll autoscale a PHP based on CPU utilization, and a Python application based on Memory Utilization.
 
 [.tiles.browse]
-== Browse modules
+== Exercises
 
-[.tile]
-.xref:01-setup.adoc[Get Started]
-* xref:01-setup.adoc#minikube[Minikube]
+=== 1. Horizontal Pod Autoscaler for CPU utilization
 
-[.tile]
-.xref:02-deploy.adoc[Deploying]
-* xref:02-deploy.adoc#package[Package the Application]
-* xref:02-deploy.adoc#deploy[Deploy the Application]
+Autoscale a PHP application based on CPU utilization.
+
+xref:02-php-hpa.adoc[Start]
+
+=== 2. Horizontal Pod Autoscaler for Memory utilization
+
+Autoscale a Python application based on Memory utilization.
+
+xref:03-python-hpa.adoc[Start]
