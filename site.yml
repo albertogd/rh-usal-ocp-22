@@ -3,7 +3,7 @@ runtime:
 
 site:
   title: Autoscaling applications with Openshift
-  url: https://albertogd.github.io/rh-usal-ocp-22/rh-usal-ocp-22/index.html
+  url: https://albertogd.github.io/rh-usal-ocp-22/index.html
   start_page: rh-usal-ocp-22::index.adoc
 
 content:
