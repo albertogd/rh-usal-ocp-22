@@ -5,7 +5,7 @@
 [.text-center.strong]
 == Introduction
 
-**Autoscaling applications in Openshift**  is the third part of **Autoscaling serverless applications in Openshift** workshop to get familiar with containers and autoscaling serverless applications in Openshift.
+**Autoscaling applications in Openshift**  is the third **Openshift** workshop of **University of Salamanca** to get familiar with containers and autoscaling serverless applications in Openshift.
 
 You’ll autoscale a PHP based on CPU utilization, and a Python application based on Memory Utilization.
 
