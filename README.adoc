@@ -3,7 +3,9 @@
 https://albertogd.github.io/rh-usal-ocp-22/rh-usal-ocp-22/index.html[Start **Autoscaling applications in Openshift**]
 
 ## Introduction
-**Autoscaling applications in Openshift** is the third **Openshift** workshops to get familiar with containers and Openshift. You’ll autoscale a PHP based on CPU utilization, and a Python application based on Memory Utilization.
+**Autoscaling applications in Openshift** is the third **Openshift** workshop of **University of Salamanca**. These workshops are designed to get a basic knowledge and get familiar with containers and Openshift.
+
+In this workshop you'll learn how to autoscale a PHP based on CPU utilization, and a Python application based on Memory Utilization.
 
 ## Exercises
 
